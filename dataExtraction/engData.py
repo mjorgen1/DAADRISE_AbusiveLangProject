@@ -16,6 +16,3 @@ data = data.drop(columns="Unnamed: 0")
 
 # Playing
 print(data['class'].value_counts()/data['class'].size)
-
-
-
