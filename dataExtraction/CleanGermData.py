@@ -6,7 +6,7 @@ def main():
     f1 = open('germeval2018.test.txt','r')
 
     # make a new text file and open it
-    f2 = open("cleanGermanDataTest.txt","w+")
+    f2 = open("cleanGermDataTest.txt","w+")
 
     # i is for the purposes of testing
     i = 1
@@ -27,7 +27,7 @@ def main():
                         if(not (line[x] in list_spaces)):
                             delete += line[x]
                         else:
-                            line = line.replace(delete, "").lstrip().rstrip()
+                            line = line.replace(delete, "").lstrip()
                             delete = ""
                             break
         i += 1
