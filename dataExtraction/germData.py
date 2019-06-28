@@ -2,6 +2,8 @@
 import pandas as pd
 import os
 import numpy as np
+import copy
+import re
 
 #Check the location of current working directory and move the dataset to that directory
 os.getcwd()
@@ -32,6 +34,18 @@ def string_to_numeric(x):
 data['labels'] = data['labels'].apply(string_to_numeric)
 
 '''0: other, 1: insult, 2: abuse'''
+
+# Clean the tweet text: remove special characters and all lower case
+tweets = copy.deepcopy(data['tweet'])
+for i in range(0, len(tweets)-1):
+    currLine = tweets[i]
+    newLine = ""
+    newLine = re.sub('[^a-üA-Ü]', ' ', currLine)
+    newLine = re.sub(r'\s+', ' ', newLine)
+    newLine = newLine.lower()
+    tweets[i] = newLine
+
+data['tweet'] = tweets
 
 # Split the data set into three data sets based on the labels
 for labels, d in data.groupby('labels'):

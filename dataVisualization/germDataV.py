@@ -35,9 +35,16 @@ def string_to_numeric(x):
 
 data['labels'] = data['labels'].apply(string_to_numeric)
 
+# Label distribution
+labels = copy.deepcopy(data['labels'])
+plt.bar(['Other', 'Insult', 'Abuse'], [labels.value_counts()[0]/len(labels), labels.value_counts()[1]/len(labels),
+                                       labels.value_counts()[2]/len(labels)])
+plt.show()
+
 # Length of tweets
 lens = data.tweet.str.len()
 plt.hist(lens, bins='auto')
+plt.xlim(0, 600)
 plt.show()
 
 
@@ -73,9 +80,9 @@ for readme in tweets:
 k = Counter(total_frequencies)
 
 high = k.most_common(10)
-labels, ys = zip(*high)
-xs = np.arange(len(labels))
+l, ys = zip(*high)
+xs = np.arange(len(l))
 width = 0.5
 plt.bar(xs, ys, width, align='center')
-plt.xticks(xs, labels, rotation = 45)
+plt.xticks(xs, l, rotation = 45)
 plt.show()

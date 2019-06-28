@@ -15,9 +15,16 @@ os.chdir('C:\\Users\\mikec\\Documents')
 # Raw data
 data = pd.read_csv("EnglishData.csv", encoding="utf-8")
 
+# Label distribution
+labels = copy.deepcopy(data['class'])
+plt.bar(['Hate', 'Offensive', 'Neither'], [labels.value_counts()[0]/len(labels), labels.value_counts()[1]/len(labels),
+                                           labels.value_counts()[2]/len(labels)])
+plt.show()
+
 # Length of tweets
 lens = data.tweet.str.len()
 plt.hist(lens, bins='auto')
+plt.xlim(0, 300)
 plt.show()
 
 # 10 most frequently appeared words
@@ -51,9 +58,10 @@ for readme in tweets:
 k = Counter(total_frequencies)
 
 high = k.most_common(10)
-labels, ys = zip(*high)
-xs = np.arange(len(labels))
+l, ys = zip(*high)
+xs = np.arange(len(l))
 width = 0.5
 plt.bar(xs, ys, width, align='center')
-plt.xticks(xs, labels)
+plt.xticks(xs, l)
 plt.show()
+
