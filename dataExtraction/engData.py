@@ -37,5 +37,7 @@ test = pd.concat([data_0.iloc[cut_0:, :], data_1.iloc[cut_1:, :], data_2.iloc[cu
 test = test.reindex(np.random.permutation(test.index))
 
 # Export dataframe as csv
-train.to_csv("EnglishCleanedTrainingData.csv", index=None, header=True)
-test.to_csv("EnglishCleanedTestingData.csv", index=None, header=True)
+train.to_csv("EnglishCleanedTrainingData.csv", index=None, header=True, encoding='utf-8')
+test.to_csv("EnglishCleanedTestingData.csv", index=None, header=True, encoding='utf-8')
+
+
