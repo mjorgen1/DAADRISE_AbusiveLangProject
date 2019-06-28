@@ -2,6 +2,8 @@
 import pandas as pd
 import os
 import numpy as np
+import copy
+import re
 
 #Check the location of current working directory and move the dataset to that directory
 os.getcwd()
@@ -19,6 +21,18 @@ data.rename(columns={'class': 'labels'}, inplace=True)
 data = data[['tweet', 'labels']]
 
 '''0: hate speech, 1: offensive language, 2: neither'''
+
+# Clean the tweet text: remove special characters and all lower case
+tweets = copy.deepcopy(data['tweet'])
+for i in range(0, len(tweets)-1):
+    currLine = tweets[i]
+    newLine = ""
+    newLine = re.sub('[^a-zA-Z]', ' ', currLine)
+    newLine = re.sub(r'\s+', ' ', newLine)
+    newLine = newLine.lower()
+    tweets[i] = newLine
+
+data['tweet'] = tweets
 
 # Split the data set into three data sets based on the labels
 for labels, d in data.groupby('labels'):
