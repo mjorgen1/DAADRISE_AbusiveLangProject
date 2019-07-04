@@ -16,7 +16,7 @@ tokenizer = ToktokTokenizer()
 stopword_list = nltk.corpus.stopwords.words('english')
 stopword_list.extend(['rt'])
 ps = PorterStemmer()
-nlp = spacy.load('en_core_web_md', parse=True, tag=True, entity=True)
+nlp = spacy.load('en_core_web_md')
 
 # Check the location of current working directory and move the dataset to that directory
 os.getcwd()

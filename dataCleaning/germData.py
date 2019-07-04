@@ -1,13 +1,23 @@
-# extract German Twitter data here from txt file and save to new excel sheet
-import pandas as pd
+# extract and preprocess German twitter data
 import os
-import numpy as np
+import pandas as pd
 import copy
+import unicodedata
 import re
+import numpy as np
+import nltk
+from nltk.tokenize.toktok import ToktokTokenizer
+import spacy
 
-#Check the location of current working directory and move the dataset to that directory
+# Initializing variables
+tokenizer = ToktokTokenizer()
+stopword_list = nltk.corpus.stopwords.words('german')
+stopword_list.extend(['|lbr|', 'ja'])
+nlp = spacy.load('de')
+
+# Check the location of current working directory and move the dataset to that directory
 os.getcwd()
-#Or change the working directory
+# Or change the working directory
 os.chdir('C:\\Users\\mikec\\Documents')
 
 # Raw data
@@ -35,15 +45,80 @@ data['labels'] = data['labels'].apply(string_to_numeric)
 
 '''0: other, 1: insult, 2: abuse'''
 
-# Clean the tweet text: remove special characters and all lower case
+# Create a copy for preprocess
+original = copy.deepcopy(data['tweet'])
 tweets = copy.deepcopy(data['tweet'])
+labels = copy.deepcopy(data['labels'])
+
+
+# Convert umlatus to different representations
+def convert_umlauts(text):
+    temp = text
+    temp = temp.replace('ä', 'ae')
+    temp = temp.replace('ö', 'oe')
+    temp = temp.replace('ü', 'ue')
+    temp = temp.replace('Ä', 'Ae')
+    temp = temp.replace('Ö', 'Oe')
+    temp = temp.replace('Ü', 'Ue')
+    temp = temp.replace('ß', 'ss')
+    return temp
+
+
+# Extract only words, so remove special characters, numbers, and punctuations
+def extract_only_words(text):
+    text = re.sub('[^a-zA-z]', ' ', text)
+    return text
+
+
+# Remove stopwords (is_lower_case can be removed if the text is lower-cased before)
+def remove_stopwords(text):
+    tokens = tokenizer.tokenize(text)
+    tokens = [token.strip() for token in tokens]
+    filtered_tokens = [token for token in tokens if token not in stopword_list]
+    filtered_text = ' '.join(filtered_tokens)
+    return filtered_text
+
+
+# Convert the text to lower-case
+def lower_case(text):
+    text = text.lower()
+    return text
+
+
+# Remove any user names referred in the text
+def remove_user_names(text):
+    text = re.sub(r'@\S+', '', text)
+    return text
+
+
+# Remove links in the text
+def remove_links(text):
+    text = re.sub(r'http\S+', '', text)
+    return text
+
+
+# Remove white spaces in the text
+def remove_white_spaces(text):
+    text = " ".join(text.split())
+    return text
+
+
+# Lemmatize text, meaning change words to their root words; for example, been becomes be
+def lemmatizing(text):
+    text = nlp(text)
+    text = ' '.join([word.lemma_ if word.lemma_ != '-PRON-' else word.text for word in text])
+    return text
+
+
 for i in range(0, len(tweets)-1):
-    currLine = tweets[i]
-    newLine = ""
-    newLine = re.sub('[^a-üA-Ü]', ' ', currLine)
-    newLine = re.sub(r'\s+', ' ', newLine)
-    newLine = newLine.lower()
-    tweets[i] = newLine
+    tweets[i] = remove_user_names(tweets[i])
+    tweets[i] = remove_links(tweets[i])
+    tweets[i] = convert_umlauts(tweets[i])
+    tweets[i] = extract_only_words(tweets[i])
+    tweets[i] = lower_case(tweets[i])
+    tweets[i] = remove_white_spaces(tweets[i])
+    tweets[i] = lemmatizing(tweets[i])
+    tweets[i] = remove_stopwords(tweets[i])
 
 data['tweet'] = tweets
 
