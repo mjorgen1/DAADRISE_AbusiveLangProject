@@ -62,8 +62,7 @@ unique_frequencies = dict()
 total_frequencies = dict()
 
 stopwords = nltk.corpus.stopwords.words('german')
-stopwords.extend(['|lbr|', 'ja'])
-#'mehr', 'mal', 'immer', 'gibt', 'd', 'u'
+stopwords.extend(['|lbr|', 'ja', 'mehr', 'mal', 'immer', 'gibt', 'd', 'u'])
 
 for readme in tweets:
     words = nltk.word_tokenize(readme)
