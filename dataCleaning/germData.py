@@ -12,7 +12,7 @@ import spacy
 # Initializing variables
 tokenizer = ToktokTokenizer()
 stopword_list = nltk.corpus.stopwords.words('german')
-stopword_list.extend(['|lbr|', 'ja'])
+#stopword_list.extend(['lbr', 'ja'])
 nlp = spacy.load('de')
 
 # Check the location of current working directory and move the dataset to that directory
@@ -110,11 +110,18 @@ def lemmatizing(text):
     return text
 
 
+# Remove underscore in the text
+def remove_underscore(text):
+    text = text.replace('_', '')
+    return text
+
+
 for i in range(0, len(tweets)-1):
     tweets[i] = remove_user_names(tweets[i])
     tweets[i] = remove_links(tweets[i])
     tweets[i] = convert_umlauts(tweets[i])
     tweets[i] = extract_only_words(tweets[i])
+    tweets[i] = remove_underscore(tweets[i])
     tweets[i] = lower_case(tweets[i])
     tweets[i] = remove_white_spaces(tweets[i])
     tweets[i] = lemmatizing(tweets[i])

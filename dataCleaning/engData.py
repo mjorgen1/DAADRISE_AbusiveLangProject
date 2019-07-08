@@ -248,6 +248,11 @@ def stemming(text):
         filtered_text.append(" ")
     return "".join(filtered_text)
 
+# Remove underscore in the text
+def remove_underscore(text):
+    text = text.replace('_', '')
+    return text
+
 
 for i in range(0, len(tweets)-1):
     tweets[i] = remove_user_names(tweets[i])
@@ -255,6 +260,7 @@ for i in range(0, len(tweets)-1):
     tweets[i] = expand_contractions(tweets[i])
     tweets[i] = remove_accent(tweets[i])
     tweets[i] = extract_only_words(tweets[i])
+    tweets[i] = remove_underscore(tweets[i])
     tweets[i] = lower_case(tweets[i])
     tweets[i] = remove_white_spaces(tweets[i])
     tweets[i] = stemming(tweets[i])
