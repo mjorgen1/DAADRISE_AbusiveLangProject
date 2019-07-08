@@ -248,6 +248,7 @@ def stemming(text):
         filtered_text.append(" ")
     return "".join(filtered_text)
 
+
 # Remove underscore in the text
 def remove_underscore(text):
     text = text.replace('_', '')
