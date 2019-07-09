@@ -116,6 +116,24 @@ def remove_underscore(text):
     return text
 
 
+# Replaces repetitions of exclamation marks
+def replace_multi_exclamation_mark(text):
+    text = re.sub(r"(\!)\1+", ' multiExclamation ', text)
+    return text
+
+
+# Replaces repetitions of question marks
+def replace_multi_question_mark(text):
+    text = re.sub(r"(\?)\1+", ' multiQuestion ', text)
+    return text
+
+
+# Replaces repetitions of stop marks
+def replace_multi_stop_mark(text):
+    text = re.sub(r"(\.)\1+", ' multiStop ', text)
+    return text
+
+
 for i in range(0, len(tweets)-1):
     tweets[i] = remove_user_names(tweets[i])
     tweets[i] = remove_links(tweets[i])
