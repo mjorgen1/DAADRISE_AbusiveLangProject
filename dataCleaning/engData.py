@@ -7,12 +7,10 @@ import re
 import numpy as np
 import nltk
 import spacy
-import string
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import word_tokenize
-from collections import Counter
 from nltk.corpus import wordnet
 
 
@@ -21,7 +19,6 @@ tokenizer = ToktokTokenizer()
 stopword_list = nltk.corpus.stopwords.words('english')
 stopword_list.extend(['rt'])
 nlp = spacy.load('en_core_web_md')
-allowedWordTypes = ["J", "R", "V", "N"]
 lemmatizer = WordNetLemmatizer()
 stemmer = PorterStemmer()
 
@@ -46,7 +43,6 @@ data = data[['tweet', 'labels']]
 
 
 # Create a copy for preprocess
-original = copy.deepcopy(data['tweet'])
 tweets = copy.deepcopy(data['tweet'])
 labels = copy.deepcopy(data['labels'])
 
@@ -273,91 +269,31 @@ def remove_underscore(text):
 
 
 # Replace an elongated word with its basic form, unless the word exists in the lexicon
-def replace_elongated(word):
-    repeat_regexp = re.compile(r'(\w*)(\w)\2(\w*)')
-    repl = r'\1\2\3'
-    if wordnet.synsets(word):
-        return word
-    repl_word = repeat_regexp.sub(repl, word)
-    if repl_word != word:
-        return replace_elongated(repl_word)
-    else:
-        return repl_word
-
-
-# Spell Correction
-def words(text):
-    return re.findall(r'\w+', text.lower())
-
-
-WORDS = Counter(words(open('corporaForSpellCorrection.txt').read()))
-
-
-# Probability of `word`.
-def P(word, N=sum(WORDS.values())):
-    return WORDS[word] / N
-
-
-# Most probable spelling correction for word.
-def spell_correction(word):
-    return max(candidates(word), key=P)
-
-
-# Generate possible spelling corrections for word.
-def candidates(word):
-    return (known([word]) or known(edits1(word)) or known(edits2(word)) or [word])
-
-
-# The subset of `words` that appear in the dictionary of WORDS.
-def known(words):
-    return set(w for w in words if w in WORDS)
-
-
-# All edits that are one edit away from `word`.
-def edits1(word):
-    letters = 'abcdefghijklmnopqrstuvwxyz'
-    splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
-    deletes = [L + R[1:] for L, R in splits if R]
-    transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R) > 1]
-    replaces = [L + c + R[1:] for L, R in splits if R for c in letters]
-    inserts = [L + c + R for L, R in splits for c in letters]
-    return set(deletes + transposes + replaces + inserts)
-
-
-# All edits that are two edits away from `word`.
-def edits2(word):
-    return (e2 for e1 in edits1(word) for e2 in edits1(e1))
-
-
-# Finds "not,never,no" and adds the tag NEG_ to all words that follow until the next punctuation
-def add_not_tag(text):
-    transformed = re.sub(r'\b(?:not|never|no)\b[\w\s]+[^\w\s]', lambda match: re.sub(r'(\s+)(\w+)', r'\1NEG_\2',
-                         match.group(0)), text, flags=re.IGNORECASE)
-    return transformed
-
-
-def tokenize(text):
-    onlyOneSentenceTokens = []
-
+def replace_elongated(text):
+    filtered_tokens = []
     tokens = nltk.word_tokenize(text)
-
     tagged = nltk.pos_tag(tokens)
+
     for w in tagged:
-        if w[1][0] in allowedWordTypes and w[0] not in stopword_list:
-            final_word = w[0]
-            final_word = replace_elongated(final_word)
-            if len(final_word) > 1:
-                final_word = spell_correction(final_word)
-            final_word = lemmatizer.lemmatize(final_word)
-            final_word = stemmer.stem(final_word)
+        word = w[0]
+        repeat_regexp = re.compile(r'(\w*)(\w)\2(\w*)')
+        repl = r'\1\2\3'
+        if wordnet.synsets(word):
+            final_word = word
+        else:
+            repl_word = repeat_regexp.sub(repl, word)
+            if repl_word != word:
+                final_word = replace_elongated(repl_word)
+            else:
+                final_word = repl_word
 
-            onlyOneSentenceTokens.append(final_word)
+        filtered_tokens.append(final_word)
 
-    onlyOneSentence = " ".join(onlyOneSentenceTokens)
-    return onlyOneSentence
+    filtered_text = " ".join(filtered_tokens)
+    return filtered_text
 
 
-for i in range(0, len(tweets)-1):
+for i in range(0, len(tweets)):
     tweets[i] = remove_user_names(tweets[i])
     tweets[i] = remove_hashtags(tweets[i])
     tweets[i] = remove_links(tweets[i])
@@ -367,12 +303,15 @@ for i in range(0, len(tweets)-1):
     tweets[i] = remove_underscore(tweets[i])
     tweets[i] = lower_case(tweets[i])
     tweets[i] = remove_white_spaces(tweets[i])
-    tweets[i] = tokenize(tweets[i])
+    tweets[i] = replace_elongated(tweets[i])
+    tweets[i] = lemmatizing(tweets[i])
+    tweets[i] = stemming(tweets[i])
     tweets[i] = remove_stopwords(tweets[i])
 
-data['tweet'] = tweets
-data['tweet'].replace('', np.nan, inplace=True)
-data.dropna(subset=['tweet'], inplace=True)
+data = pd.concat([tweets, data], axis=1)
+data.columns = ['cleaned_tweet', 'tweet', 'labels']
+data['cleaned_tweet'].replace('', np.nan, inplace=True)
+data.dropna(subset=['cleaned_tweet'], inplace=True)
 
 # Split the data set into three data sets based on the labels
 for labels, d in data.groupby('labels'):
