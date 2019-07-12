@@ -5,6 +5,7 @@ import numpy as np
 import re
 import nltk
 import textstat
+import fasttext
 from functools import partial
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -83,7 +84,7 @@ def number_of_emoticons(text):
 ''' N-gram Features '''
 # Returns bag of n-grams
 def bag_of_n_grams(text, min_n, max_n):
-    bv = CountVectorizer(ngram_range=(min_n, max_n), max_features=10000)
+    bv = CountVectorizer(ngram_range=(min_n, max_n), max_features=1000)
     bv_matrix = bv.fit_transform(text).toarray()
     bv_vocab = bv.get_feature_names()
     bv_data = pd.DataFrame(bv_matrix, columns=bv_vocab)
@@ -91,14 +92,14 @@ def bag_of_n_grams(text, min_n, max_n):
 
 
 def tf_idf(text, min_n, max_n):
-    tv = TfidfVectorizer(ngram_range=(min_n, max_n), max_features=10000)
+    tv = TfidfVectorizer(ngram_range=(min_n, max_n), max_features=1000)
     tv_matrix = tv.fit_transform(text).toarray()
     tv_vocab = tv.get_feature_names()
     tv_data = pd.DataFrame(np.round(tv_matrix, 2), columns=tv_vocab)
     return tv_data
 
 
-''' Textstat scores '''
+''' Fasttext'''
 
 
 
@@ -192,6 +193,6 @@ features['linsear write formula'] = lwf
 features['dale chall readability score'] = dcrs
 
 bn_data = bag_of_n_grams(clean_tweets, 1, 3)
-#tf_data = tf_idf(clean_tweets, 1, 3)
+tf_data = tf_idf(clean_tweets, 1, 3)
 
 
