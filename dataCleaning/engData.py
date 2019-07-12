@@ -202,6 +202,7 @@ def expand_contractions(text, contraction_mapping=CONTRACTION_MAP):
 
 # Extract only words, so remove special characters, numbers, and punctuations
 def extract_only_words(text):
+    text = re.sub(r'[^\w\s]', ' ', text)
     text = re.sub('[^a-zA-z]', ' ', text)
     return text
 
