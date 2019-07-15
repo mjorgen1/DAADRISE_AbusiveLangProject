@@ -12,7 +12,7 @@ import spacy
 # Initializing variables
 tokenizer = ToktokTokenizer()
 stopword_list = nltk.corpus.stopwords.words('german')
-#stopword_list.extend(['lbr', 'ja'])
+stopword_list.extend(['lbr'])
 nlp = spacy.load('de')
 
 # Check the location of current working directory and move the dataset to that directory
@@ -46,7 +46,6 @@ data['labels'] = data['labels'].apply(string_to_numeric)
 '''0: other, 1: insult, 2: abuse'''
 
 # Create a copy for preprocess
-original = copy.deepcopy(data['tweet'])
 tweets = copy.deepcopy(data['tweet'])
 labels = copy.deepcopy(data['labels'])
 
@@ -116,24 +115,6 @@ def remove_underscore(text):
     return text
 
 
-# Replaces repetitions of exclamation marks
-def replace_multi_exclamation_mark(text):
-    text = re.sub(r"(\!)\1+", ' multiExclamation ', text)
-    return text
-
-
-# Replaces repetitions of question marks
-def replace_multi_question_mark(text):
-    text = re.sub(r"(\?)\1+", ' multiQuestion ', text)
-    return text
-
-
-# Replaces repetitions of stop marks
-def replace_multi_stop_mark(text):
-    text = re.sub(r"(\.)\1+", ' multiStop ', text)
-    return text
-
-
 for i in range(0, len(tweets)-1):
     tweets[i] = remove_user_names(tweets[i])
     tweets[i] = remove_links(tweets[i])
@@ -145,7 +126,10 @@ for i in range(0, len(tweets)-1):
     tweets[i] = lemmatizing(tweets[i])
     tweets[i] = remove_stopwords(tweets[i])
 
-data['tweet'] = tweets
+data = pd.concat([tweets, data], axis=1)
+data.columns = ['cleaned_tweet', 'tweet', 'labels']
+data['cleaned_tweet'].replace('', np.nan, inplace=True)
+data.dropna(subset=['cleaned_tweet'], inplace=True)
 
 # Split the data set into three data sets based on the labels
 for labels, d in data.groupby('labels'):
