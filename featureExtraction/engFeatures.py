@@ -4,8 +4,7 @@ import copy
 import numpy as np
 import re
 import nltk
-import textstat
-import fasttext
+import readability
 from functools import partial
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -99,10 +98,6 @@ def tf_idf(text, min_n, max_n):
     return tv_data
 
 
-''' Fasttext'''
-
-
-
 ''' Testing '''
 # Remove any user names referred in the text
 def remove_user_names(text):
@@ -133,23 +128,12 @@ def remove_emojis(text):
     return text
 
 
-def fasttext_skipgram(text, model):
-    tokens = nltk.word_tokenize(text)
-    tweet_vector = []
-    count = 0
-    for word in tokens:
-        tweet_vector = tweet_vector + model[word]
-        count += 1
-    return tweet_vector / count
-
-
 tl, nt, irt, nom, noh, nol, noel, nos, noem = [], [], [], [], [], [], [], [], []
-fre, fkg, fs, si, ari, cli, lwf, dcrs = [], [], [], [], [], [], [], []
-skipgram = []
+fkg, ari, cli, fre, gfi, lix, si, rix, dci = [], [], [], [], [], [], [], [], []
+cpw, spw, wps, ttr, c, s, w, wt, lw, cw, cwdc = [], [], [], [], [], [], [], [], [], [], []
 
-#model = fasttext.train_unsupervised(tweets)
 for i in range(0, len(tweets)):
-    #'''
+    # Linguistic
     tl.append(text_length(tweets[i]))
     irt.append(is_retweet(tweets[i]))
     nom.append(number_of_mentions(tweets[i]))
@@ -159,28 +143,39 @@ for i in range(0, len(tweets)):
     nt.append(number_of_tokens(tweets[i]))
     noel.append(number_of_elongated(tweets[i]))
     nos.append(number_of_slangs(tweets[i]))
-    
-    
+
+    # Readability
     tweets[i] = remove_user_names(tweets[i])
     tweets[i] = remove_hashtags(tweets[i])
     tweets[i] = remove_links(tweets[i])
     tweets[i] = remove_underscore(tweets[i])
     tweets[i] = remove_emojis(tweets[i])
+    measures = readability.getmeasures(tweets[i], lang='en')
+    fkg.append(measures['readability grades']['Kincaid'])
+    ari.append(measures['readability grades']['ARI'])
+    cli.append(measures['readability grades']['Coleman-Liau'])
+    fre.append(measures['readability grades']['FleschReadingEase'])
+    gfi.append(measures['readability grades']['GunningFogIndex'])
+    lix.append(measures['readability grades']['LIX'])
+    si.append(measures['readability grades']['SMOGIndex'])
+    rix.append(measures['readability grades']['RIX'])
+    dci.append(measures['readability grades']['DaleChallIndex'])
 
-    fre.append(textstat.flesch_reading_ease(tweets[i]))
-    fkg.append(textstat.flesch_kincaid_grade(tweets[i]))
-    fs.append(textstat.gunning_fog(tweets[i]))
-    si.append(textstat.smog_index(tweets[i]))
-    ari.append(textstat.automated_readability_index(tweets[i]))
-    cli.append(textstat.coleman_liau_index(tweets[i]))
-    lwf.append(textstat.linsear_write_formula(tweets[i]))
-    dcrs.append(textstat.dale_chall_readability_score(tweets[i]))
-    #'''
-    #skipgram.append(fasttext_skipgram(tweets[i]), model)
-
+    # Sentence
+    cpw.append(measures['sentence info']['characters_per_word'])
+    spw.append(measures['sentence info']['syll_per_word'])
+    wps.append(measures['sentence info']['words_per_sentence'])
+    ttr.append(measures['sentence info']['type_token_ratio'])
+    c.append(measures['sentence info']['characters'])
+    s.append(measures['sentence info']['syllables'])
+    w.append(measures['sentence info']['words'])
+    wt.append(measures['sentence info']['wordtypes'])
+    lw.append(measures['sentence info']['long_words'])
+    cw.append(measures['sentence info']['complex_words'])
+    cwdc.append(measures['sentence info']['complex_words_dc'])
 
 features = pd.DataFrame()
-#'''
+# Linguistic
 features['text length'] = tl
 features['number of words'] = nt
 features['retweet'] = irt
@@ -190,16 +185,33 @@ features['number of links'] = nol
 features['number of elongated'] = noel
 features['number of slangs'] = nos
 features['number of emoticons'] = noem
-features['flesch reading ease'] = fre
-features['flesch kincaid grade'] = fkg
-features['gunning fog'] = fs
-features['smog index'] = si
-features['automated readability index'] = ari
-features['coleman liau index'] = cli
-features['linsear write formula'] = lwf
-features['dale chall readability score'] = dcrs
+# Readability
+features['Kincaid'] = fkg
+features['ARI'] = ari
+features['Coleman-Liau'] = cli
+features['FleschReadingEase'] = fre
+features['GunningFogIndex'] = gfi
+features['LIX'] = lix
+features['SMOGIndex'] = si
+features['RIX'] = rix
+features['DaleChallIndex'] = dci
+# Sentence
+features['Characters per word'] = cpw
+features['Syllables per word'] = spw
+features['Words per sentence'] = wps
+features['Type toke ratio'] = ttr
+features['Characters'] = c
+features['Syllables'] = s
+features['Words'] = w
+features['Wordtypes'] = wt
+features['Long words'] = lw
+features['Complex words'] = cw
+features['Complex words dc'] = cwdc
 
+
+
+'''
 bn_data = bag_of_n_grams(clean_tweets, 1, 3)
 tf_data = tf_idf(clean_tweets, 1, 3)
-#'''
+'''
 
