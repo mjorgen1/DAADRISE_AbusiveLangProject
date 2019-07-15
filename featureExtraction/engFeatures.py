@@ -127,6 +127,15 @@ def remove_underscore(text):
     text = text.replace('_', '')
     return text
 
+def fasttext_skipgram(text, model):
+    tokens = nltk.word_tokenize(text)
+    tweet_vector = []
+    count = 0
+    for word in tokens:
+        tweet_vector = tweet_vector + model[word]
+        count += 1
+    return tweet_vector / count
+
 
 tl = []
 nt = []
@@ -145,8 +154,11 @@ ari = []
 cli = []
 lwf = []
 dcrs = []
+skipgram = []
 
+model = fasttext.train_unsupervised(tweets)
 for i in range(0, len(tweets)):
+    '''
     tl.append(text_length(tweets[i]))
     irt.append(is_retweet(tweets[i]))
     nom.append(number_of_mentions(tweets[i]))
@@ -156,7 +168,8 @@ for i in range(0, len(tweets)):
     nt.append(number_of_tokens(tweets[i]))
     noel.append(number_of_elongated(tweets[i]))
     nos.append(number_of_slangs(tweets[i]))
-
+    
+    
     tweets[i] = remove_user_names(tweets[i])
     tweets[i] = remove_hashtags(tweets[i])
     tweets[i] = remove_links(tweets[i])
@@ -170,10 +183,12 @@ for i in range(0, len(tweets)):
     cli.append(textstat.coleman_liau_index(tweets[i]))
     lwf.append(textstat.linsear_write_formula(tweets[i]))
     dcrs.append(textstat.dale_chall_readability_score(tweets[i]))
-
+    '''
+    skipgram.append(fasttext_skipgram(tweets[i]), model)
 
 
 features = pd.DataFrame()
+'''
 features['text length'] = tl
 features['number of words'] = nt
 features['retweet'] = irt
@@ -194,5 +209,5 @@ features['dale chall readability score'] = dcrs
 
 bn_data = bag_of_n_grams(clean_tweets, 1, 3)
 tf_data = tf_idf(clean_tweets, 1, 3)
-
+'''
 
