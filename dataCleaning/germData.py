@@ -41,18 +41,7 @@ def string_to_numeric(x):
         return 2
 
 
-# Changing numeric labels to string labels
-def numeric_to_string(x):
-    if x == 0:
-        return 'OTHER'
-    if x == 1:
-        return 'INSULT'
-    if x == 2:
-        return 'ABUSE'
-
-
 data['labels'] = data['labels'].apply(string_to_numeric)
-string_labels = data['labels'].apply(numeric_to_string)
 
 '''0: other, 1: insult, 2: abuse'''
 
@@ -137,11 +126,12 @@ for i in range(0, len(tweets)-1):
     tweets[i] = lemmatizing(tweets[i])
     tweets[i] = remove_stopwords(tweets[i])
 
-data = pd.concat([tweets, data, string_labels], axis=1)
-data.columns = ['cleaned_tweet', 'tweet', 'labels', 'string_labels']
+data = pd.concat([tweets, data], axis=1)
+data.columns = ['cleaned_tweet', 'tweet', 'labels']
 data['cleaned_tweet'].replace('', np.nan, inplace=True)
 data.dropna(subset=['cleaned_tweet'], inplace=True)
 
+'''
 # Split the data set into three data sets based on the labels
 for labels, d in data.groupby('labels'):
     globals()['data_' + str(labels)] = d
@@ -158,7 +148,7 @@ train = train.reindex(np.random.permutation(train.index))
 
 test = pd.concat([data_0.iloc[cut_0:, :], data_1.iloc[cut_1:, :], data_2.iloc[cut_2:, :]])
 test = test.reindex(np.random.permutation(test.index))
+'''
 
 # Export dataframe as csv
-train.to_csv("GermanCleanedTrainingData.csv", index=None, header=True, encoding='utf-8')
-test.to_csv("GermanCleanedTestingData.csv", index=None, header=True, encoding='utf-8')
+data.to_csv("GermanCleanedData.csv", index=None, header=True, encoding='utf-8')

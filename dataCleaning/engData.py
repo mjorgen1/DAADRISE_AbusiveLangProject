@@ -39,19 +39,6 @@ data = data.iloc[:, 5:]
 data.rename(columns={'class': 'labels'}, inplace=True)
 data = data[['tweet', 'labels']]
 
-
-# Changing numeric labels to string labels
-def numeric_to_string(x):
-    if x == 0:
-        return 'HATE'
-    if x == 1:
-        return 'OFFENSIVE'
-    if x == 2:
-        return 'NEITHER'
-
-
-string_labels = data['labels'].apply(numeric_to_string)
-
 '''0: hate speech, 1: offensive language, 2: neither'''
 
 
@@ -322,11 +309,12 @@ for i in range(0, len(tweets)):
     tweets[i] = stemming(tweets[i])
     tweets[i] = remove_stopwords(tweets[i])
 
-data = pd.concat([tweets, data, string_labels], axis=1)
-data.columns = ['cleaned_tweet', 'tweet', 'labels', 'string_labels']
+data = pd.concat([tweets, data], axis=1)
+data.columns = ['cleaned_tweet', 'tweet', 'labels']
 data['cleaned_tweet'].replace('', np.nan, inplace=True)
 data.dropna(subset=['cleaned_tweet'], inplace=True)
 
+'''
 # Split the data set into three data sets based on the labels
 for labels, d in data.groupby('labels'):
     globals()['data_' + str(labels)] = d
@@ -336,15 +324,9 @@ del d
 cut_0 = round(len(data_0.index) * 0.8)
 cut_1 = round(len(data_1.index) * 0.8)
 cut_2 = round(len(data_2.index) * 0.8)
-
-# Construct train and test data sets
-train = pd.concat([data_0.iloc[:cut_0, :], data_1.iloc[:cut_1, :], data_2.iloc[:cut_2, :]])
-train = train.reindex(np.random.permutation(train.index))
-test = pd.concat([data_0.iloc[cut_0:, :], data_1.iloc[cut_1:, :], data_2.iloc[cut_2:, :]])
-test = test.reindex(np.random.permutation(test.index))
+'''
 
 # Export dataframe as csv
-train.to_csv("EnglishCleanedTrainingData.csv", index=None, header=True, encoding='utf-8')
-test.to_csv("EnglishCleanedTestingData.csv", index=None, header=True, encoding='utf-8')
+data.to_csv("EnglishCleanedData.csv", index=None, header=True, encoding='utf-8')
 
 
