@@ -15,8 +15,9 @@ from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
 import matplotlib.pyplot as plt
 import seaborn
+%cd ../Code_Examples/
 
-df = pd.read_csv("C:/Users/mikec/Documents/davidson/data/labeled_data.csv")
+df = pd.read_csv("labeled_data.csv")
 
 tweets=df.tweet
 
