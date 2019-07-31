@@ -15,9 +15,6 @@ from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
 import matplotlib.pyplot as plt
 import seaborn
-import os
-
-print(os.getcwd())
 
 df = pd.read_csv("labeled_data.csv")
 
