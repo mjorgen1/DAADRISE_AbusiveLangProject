@@ -20,7 +20,6 @@ df = pd.read_csv("labeled_data.csv")
 
 tweets=df.tweet
 
-nltk.download('english')
 stopwords = nltk.corpus.stopwords.words("english")
 
 other_exclusions = ["#ff", "ff", "rt"]
