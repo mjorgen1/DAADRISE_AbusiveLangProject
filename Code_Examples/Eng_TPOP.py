@@ -209,6 +209,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_
 
 from tpot import TPOTClassifier
 
-tpot = TPOTClassifier(population_size=20, verbosity=2, scoring='f1_weighted', max_time_mins=30)
+tpot = TPOTClassifier(max_time_mins=60, population_size=20, verbosity=2, scoring='f1_weighted')
 tpot.fit(X_train, y_train)
 print(tpot.score(X_test, y_test))
