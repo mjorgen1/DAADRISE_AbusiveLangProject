@@ -197,6 +197,29 @@ feature_names = variables+pos_variables+other_features_names
 
 X = pd.DataFrame(M)
 y = df['class'].astype(int)
+X.columns = feature_names
+
+#Feature selection
+from sklearn.feature_selection import SelectKBest, f_classif
+# Univariate Selection -- apply SelectKBest class to extract top n best features
+bestfeatures = SelectKBest(score_func=f_classif, k=3000)
+fit = bestfeatures.fit(X,y)
+dfscores = pd.DataFrame(fit.scores_)
+dfcolumns = pd.DataFrame(X.columns)
+# concat two dataframes for better visualization
+featureScores = pd.concat([dfcolumns,dfscores],axis=1)
+featureScores.columns = ['Specs','Score']  #naming the dataframe columns
+print('Univariate Selection features found, use getUnivariateData() to get the features')
+# Extract the top n features
+uni_selected_feat = featureScores.nlargest(3000,'Score')
+print(uni_selected_feat) # print out the top n features selected
+# Saving the top n features to a data frame
+top_univariate_features = pd.DataFrame()
+for i in range(0, 3000):
+    curr_column_vals = X.iloc[:, uni_selected_feat.iloc[i].name]
+    curr_column_name = uni_selected_feat.iloc[i][0]
+    top_univariate_features[curr_column_name] = curr_column_vals
+X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
