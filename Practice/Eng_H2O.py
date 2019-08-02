@@ -1,18 +1,13 @@
 import pandas as pd
 import numpy as np
-import pickle
-import sys
-from sklearn.feature_extraction.text import TfidfVectorizer
 import nltk
 from nltk.stem.porter import *
-import string
-import re
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as VS
 from textstat.textstat import *
-from sklearn.linear_model import LogisticRegression
-from sklearn.feature_selection import SelectFromModel
+from sklearn import metrics
 from sklearn.metrics import classification_report
-from sklearn.svm import LinearSVC
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn
 
@@ -203,8 +198,6 @@ feature_names = variables+pos_variables+other_features_names
 X = pd.DataFrame(M)
 y = df['class'].astype(int)
 
-from sklearn.model_selection import train_test_split
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
 from imblearn.under_sampling import ClusterCentroids
@@ -283,9 +276,9 @@ seaborn.heatmap(confusion_df,annot=True,annot_kws={"size": 12},cmap='gist_gray_r
 plt.ylabel(r'True categories',fontsize=14)
 plt.xlabel(r'Predicted categories',fontsize=14)
 plt.tick_params(labelsize=12)
-plt.savefig('C:/Users/mikec/Documents/Results/Univariate3000ClusterMax05.png')
+plt.savefig('Univariate3000ClusterMax05.png')
 
-f = open("C:/Users/mikec/Documents/Results/Univariate3000ClusterMax05.txt", "a")
+f = open("Univariate3000ClusterMax05.txt", "a")
 print("Univariate feature selection with 3000 features and under-sampling with cluster centroids, max run time 30 mins", file=f)
 print(report, file=f)
 print(metrics.confusion_matrix(y_test, y_pred), file=f)
