@@ -224,87 +224,16 @@ X = top_univariate_features
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
 from imblearn.under_sampling import ClusterCentroids
+print("Cluster Centroids!!")
 cc = ClusterCentroids(random_state=2)
-X_cc, y_cc = cc.fit_resample(X_train, y_train)
-X_cc = pd.DataFrame(X_cc)
+X_res, y_res = cc.fit_resample(X_train, y_train)
+X_cc = pd.DataFrame(X_res)
 X_cc.columns = uni_selected_feat['Specs']
-y_cc = pd.DataFrame(y_cc)
-y_cc.columns = ['lablels']
-X_train = X_cc
-y_train = y_cc
+y_cc = pd.DataFrame()
+y_cc['labels'] = y_res
+X_cc.to_csv('X_cc.csv', index=None, header=True, encoding='utf-8')
+y_cc.to_csv('y_cc.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
 
-y_test = y_test.to_frame(name='labels')
 
-X_train.to_csv('X_train.csv', index=None, header=True, encoding='utf-8')
-X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
-y_train.to_csv('y_train.csv', index=None, header=True, encoding='utf-8')
-y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
 
-import h2o
-h2o.init()
-from h2o.automl import H2OAutoML
-X_train = h2o.import_file('X_train.csv')
-y_train = h2o.import_file('y_train.csv')
-X_test = h2o.import_file('X_test.csv')
-y_test = h2o.import_file('y_test.csv')
-# preparing the train and test data sets
-# now convert tweet vecs and labels to a pandas dataframe and back to h2o dataframe
-train = X_train.cbind(y_train)
-test = X_test.cbind(y_test)
-# more on data prep
-x = train.columns         # x: A list/vector of predictor column names or indexes.
-                          # This argument only needs to be specified if the user wants to exclude columns from the
-                          # set of predictors. If all columns (other than the response) should be used in prediction,
-                          # then this does not need to be set.
-
-y = "labels"              # This argument is the name (or index) of the response column
-x.remove(y)
-
-# need to set train and test
-train[y] = train[y].asfactor()
-test[y] = test[y].asfactor()
-# now the AUTO-ML piece comes in
-aml = H2OAutoML(max_runtime_secs=1800, balance_classes=True) #max_models=10 or 20?, max_runtime_secs=3600
-aml.train(x=x, y=y, training_frame=train)
-
-# View the AutoML Leaderboard
-lb = aml.leaderboard
-lb.head(rows=lb.nrows)  # Print all rows instead of default (10 rows)
-# The leader model is stored here
-aml.leader
-
-preds = aml.predict(test)
-print(preds)
-
-var = preds["predict"].cbind(test[y])
-print(var)
-
-# convert to pandas dataframe
-y_test = h2o.as_list(test[y], use_pandas=True)
-y_pred = h2o.as_list(preds["predict"])
-report = classification_report(y_test, y_pred)
-print(report)
-print(metrics.confusion_matrix(y_test, y_pred))
-print(metrics.accuracy_score(y_test, y_pred))
-print(metrics.f1_score(y_test, y_pred, average='weighted'))
-
-confusion_matrix = metrics.confusion_matrix(y_test,y_pred)
-matrix_proportions = np.zeros((3,3))
-for i in range(0,3):
-    matrix_proportions[i,:] = confusion_matrix[i,:]/float(confusion_matrix[i,:].sum())
-names=['Hate','Offensive','Neither']
-confusion_df = pd.DataFrame(matrix_proportions, index=names,columns=names)
-plt.figure(figsize=(5,5))
-seaborn.heatmap(confusion_df,annot=True,annot_kws={"size": 12},cmap='gist_gray_r',cbar=False, square=True,fmt='.2f')
-plt.ylabel(r'True categories',fontsize=14)
-plt.xlabel(r'Predicted categories',fontsize=14)
-plt.tick_params(labelsize=12)
-plt.savefig('Univariate3000ClusterMax05.png')
-
-f = open("Univariate3000ClusterMax05.txt", "a")
-print("Univariate feature selection with 3000 features and under-sampling with cluster centroids, max run time 30 mins", file=f)
-print(report, file=f)
-print(metrics.confusion_matrix(y_test, y_pred), file=f)
-print(metrics.accuracy_score(y_test, y_pred), file=f)
-print(metrics.f1_score(y_test, y_pred, average='weighted'), file=f)
-f.close()
