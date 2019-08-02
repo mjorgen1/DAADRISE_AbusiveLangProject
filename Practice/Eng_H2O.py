@@ -1,18 +1,13 @@
 import pandas as pd
 import numpy as np
-import pickle
-import sys
-from sklearn.feature_extraction.text import TfidfVectorizer
 import nltk
 from nltk.stem.porter import *
-import string
-import re
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as VS
 from textstat.textstat import *
-from sklearn.linear_model import LogisticRegression
-from sklearn.feature_selection import SelectFromModel
+from sklearn import metrics
 from sklearn.metrics import classification_report
-from sklearn.svm import LinearSVC
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn
 
@@ -202,16 +197,114 @@ feature_names = variables+pos_variables+other_features_names
 
 X = pd.DataFrame(M)
 y = df['class'].astype(int)
+X.columns = feature_names
 
-from sklearn.model_selection import train_test_split
+#Feature selection
+from sklearn.feature_selection import SelectKBest, f_classif
+# Univariate Selection -- apply SelectKBest class to extract top n best features
+bestfeatures = SelectKBest(score_func=f_classif, k=3000)
+fit = bestfeatures.fit(X,y)
+dfscores = pd.DataFrame(fit.scores_)
+dfcolumns = pd.DataFrame(X.columns)
+# concat two dataframes for better visualization
+featureScores = pd.concat([dfcolumns,dfscores],axis=1)
+featureScores.columns = ['Specs','Score']  #naming the dataframe columns
+print('Univariate Selection features found, use getUnivariateData() to get the features')
+# Extract the top n features
+uni_selected_feat = featureScores.nlargest(3000,'Score')
+print(uni_selected_feat) # print out the top n features selected
+# Saving the top n features to a data frame
+top_univariate_features = pd.DataFrame()
+for i in range(0, 3000):
+    curr_column_vals = X.iloc[:, uni_selected_feat.iloc[i].name]
+    curr_column_name = uni_selected_feat.iloc[i][0]
+    top_univariate_features[curr_column_name] = curr_column_vals
+X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
-from tpot import TPOTClassifier
+from imblearn.under_sampling import ClusterCentroids
+cc = ClusterCentroids(random_state=2)
+X_cc, y_cc = cc.fit_resample(X_train, y_train)
+X_cc = pd.DataFrame(X_cc)
+X_cc.columns = uni_selected_feat['Specs']
+y_cc = pd.DataFrame(y_cc)
+y_cc.columns = ['lablels']
+X_train = X_cc
+y_train = y_cc
 
-tpot = TPOTClassifier(generations=3, population_size=20, verbosity=2, scoring='roc_auc')
-tpot.fit(X_train, y_train)
-f = open("TPOTgeneration3.txt", "a")
-print("TPOT: generations 3, population size 20, scoring roc_auc", file=f)
-print(tpot.score(X_test, y_test), file=f)
+y_test = y_test.to_frame(name='labels')
+
+X_train.to_csv('X_train.csv', index=None, header=True, encoding='utf-8')
+X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
+y_train.to_csv('y_train.csv', index=None, header=True, encoding='utf-8')
+y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
+
+import h2o
+h2o.init()
+from h2o.automl import H2OAutoML
+X_train = h2o.import_file('X_train.csv')
+y_train = h2o.import_file('y_train.csv')
+X_test = h2o.import_file('X_test.csv')
+y_test = h2o.import_file('y_test.csv')
+# preparing the train and test data sets
+# now convert tweet vecs and labels to a pandas dataframe and back to h2o dataframe
+train = X_train.cbind(y_train)
+test = X_test.cbind(y_test)
+# more on data prep
+x = train.columns         # x: A list/vector of predictor column names or indexes.
+                          # This argument only needs to be specified if the user wants to exclude columns from the
+                          # set of predictors. If all columns (other than the response) should be used in prediction,
+                          # then this does not need to be set.
+
+y = "labels"              # This argument is the name (or index) of the response column
+x.remove(y)
+
+# need to set train and test
+train[y] = train[y].asfactor()
+test[y] = test[y].asfactor()
+# now the AUTO-ML piece comes in
+aml = H2OAutoML(max_runtime_secs=1800, balance_classes=True) #max_models=10 or 20?, max_runtime_secs=3600
+aml.train(x=x, y=y, training_frame=train)
+
+# View the AutoML Leaderboard
+lb = aml.leaderboard
+lb.head(rows=lb.nrows)  # Print all rows instead of default (10 rows)
+# The leader model is stored here
+aml.leader
+
+preds = aml.predict(test)
+print(preds)
+
+var = preds["predict"].cbind(test[y])
+print(var)
+
+# convert to pandas dataframe
+y_test = h2o.as_list(test[y], use_pandas=True)
+y_pred = h2o.as_list(preds["predict"])
+report = classification_report(y_test, y_pred)
+print(report)
+print(metrics.confusion_matrix(y_test, y_pred))
+print(metrics.accuracy_score(y_test, y_pred))
+print(metrics.f1_score(y_test, y_pred, average='weighted'))
+
+confusion_matrix = metrics.confusion_matrix(y_test,y_pred)
+matrix_proportions = np.zeros((3,3))
+for i in range(0,3):
+    matrix_proportions[i,:] = confusion_matrix[i,:]/float(confusion_matrix[i,:].sum())
+names=['Hate','Offensive','Neither']
+confusion_df = pd.DataFrame(matrix_proportions, index=names,columns=names)
+plt.figure(figsize=(5,5))
+seaborn.heatmap(confusion_df,annot=True,annot_kws={"size": 12},cmap='gist_gray_r',cbar=False, square=True,fmt='.2f')
+plt.ylabel(r'True categories',fontsize=14)
+plt.xlabel(r'Predicted categories',fontsize=14)
+plt.tick_params(labelsize=12)
+plt.savefig('Univariate3000ClusterMax05.png')
+
+f = open("Univariate3000ClusterMax05.txt", "a")
+print("Univariate feature selection with 3000 features and under-sampling with cluster centroids, max run time 30 mins", file=f)
+print(report, file=f)
+print(metrics.confusion_matrix(y_test, y_pred), file=f)
+print(metrics.accuracy_score(y_test, y_pred), file=f)
+print(metrics.f1_score(y_test, y_pred, average='weighted'), file=f)
 f.close()
