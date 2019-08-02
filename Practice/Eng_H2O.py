@@ -223,6 +223,16 @@ X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
+from imblearn.under_sampling import RandomUnderSampler
+print("Random Under Sampler!!")
+rus = RandomUnderSampler(random_state=42)
+X_res, y_res = rus.fit_resample(X_train, y_train)
+X_rus = pd.DataFrame(X_res)
+X_rus.columns = uni_selected_feat['Specs']
+y_rus = pd.DataFrame()
+y_rus['labels'] = y_res
+print("Done!")
+
 from imblearn.under_sampling import ClusterCentroids
 print("Cluster Centroids!!")
 cc = ClusterCentroids(random_state=2)
@@ -234,6 +244,69 @@ y_cc['labels'] = y_res
 X_cc.to_csv('X_cc.csv', index=None, header=True, encoding='utf-8')
 y_cc.to_csv('y_cc.csv', index=None, header=True, encoding='utf-8')
 print("Done!")
+
+from imblearn.under_sampling import CondensedNearestNeighbour
+print("Condensed Nearest Neighbour!!")
+cnn = CondensedNearestNeighbour(random_state=2)
+X_res, y_res = cnn.fit_resample(X_train, y_train)
+X_cnn = pd.DataFrame(X_res)
+X_cnn.columns = uni_selected_feat['Specs']
+y_cnn = pd.DataFrame()
+y_cnn['labels'] = y_res
+X_cnn.to_csv('X_cnn.csv', index=None, header=True, encoding='utf-8')
+y_cnn.to_csv('y_cnn.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+from imblearn.under_sampling import EditedNearestNeighbours
+print("Edited Nearest Neighbours!!")
+enn = EditedNearestNeighbours()
+X_res, y_res = enn.fit_resample(X_train, y_train)
+X_enn = pd.DataFrame(X_res)
+X_enn.columns = uni_selected_feat['Specs']
+y_enn = pd.DataFrame()
+y_enn['labels'] = y_res
+X_enn.to_csv('X_enn.csv', index=None, header=True, encoding='utf-8')
+y_enn.to_csv('y_enn.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+from imblearn.under_sampling import AllKNN
+print("AllKNN!!")
+allknn = AllKNN()
+X_res, y_res = allknn.fit_resample(X_train, y_train)
+X_allknn = pd.DataFrame(X_res)
+X_allknn.columns = uni_selected_feat['Specs']
+y_allknn = pd.DataFrame()
+y_allknn['labels'] = y_res
+X_allknn.to_csv('X_allknn.csv', index=None, header=True, encoding='utf-8')
+y_allknn.to_csv('y_allknn.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+from imblearn.under_sampling import NeighbourhoodCleaningRule
+print("Neighourhood Cleaning Rule!!")
+ncr = NeighbourhoodCleaningRule()
+X_res, y_res = ncr.fit_resample(X_train, y_train)
+X_ncr = pd.DataFrame(X_res)
+X_ncr.columns = uni_selected_feat['Specs']
+y_ncr = pd.DataFrame()
+y_ncr['labels'] = y_res
+X_ncr.to_csv('X_ncr.csv', index=None, header=True, encoding='utf-8')
+y_ncr.to_csv('y_ncr.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+from imblearn.under_sampling import OneSidedSelection
+print("One Sided Selection!!")
+oss = OneSidedSelection(random_state=2)
+X_res, y_res = oss.fit_resample(X_train, y_train)
+X_oss = pd.DataFrame(X_res)
+X_oss.columns = uni_selected_feat['Specs']
+y_oss = pd.DataFrame()
+y_oss['labels'] = y_res
+X_oss.to_csv('X_oss.csv', index=None, header=True, encoding='utf-8')
+y_oss.to_csv('y_oss.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+
+
 
 
 
