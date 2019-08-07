@@ -223,9 +223,9 @@ X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
-X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
+X_test.to_csv('X_test500.csv', index=None, header=True, encoding='utf-8')
 y_test = y_test.to_frame(name='labels')
-y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
+y_test.to_csv('y_test500.csv', index=None, header=True, encoding='utf-8')
 
 from imblearn.under_sampling import CondensedNearestNeighbour
 print("Condensed Nearest Neighbour!!")
@@ -267,9 +267,9 @@ X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
-X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
+X_test.to_csv('X_test1000.csv', index=None, header=True, encoding='utf-8')
 y_test = y_test.to_frame(name='labels')
-y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
+y_test.to_csv('y_test1000.csv', index=None, header=True, encoding='utf-8')
 
 from imblearn.under_sampling import CondensedNearestNeighbour
 print("Condensed Nearest Neighbour!!")
@@ -311,9 +311,9 @@ X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
-X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
+X_test.to_csv('X_test3000.csv', index=None, header=True, encoding='utf-8')
 y_test = y_test.to_frame(name='labels')
-y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
+y_test.to_csv('y_test3000.csv', index=None, header=True, encoding='utf-8')
 
 from imblearn.under_sampling import CondensedNearestNeighbour
 print("Condensed Nearest Neighbour!!")
