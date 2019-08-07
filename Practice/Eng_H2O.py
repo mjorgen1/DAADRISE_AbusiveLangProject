@@ -202,6 +202,94 @@ X.columns = feature_names
 #Feature selection
 from sklearn.feature_selection import SelectKBest, f_classif
 # Univariate Selection -- apply SelectKBest class to extract top n best features
+bestfeatures = SelectKBest(score_func=f_classif, k=500)
+fit = bestfeatures.fit(X,y)
+dfscores = pd.DataFrame(fit.scores_)
+dfcolumns = pd.DataFrame(X.columns)
+# concat two dataframes for better visualization
+featureScores = pd.concat([dfcolumns,dfscores],axis=1)
+featureScores.columns = ['Specs','Score']  #naming the dataframe columns
+print('Univariate Selection features found, use getUnivariateData() to get the features')
+# Extract the top n features
+uni_selected_feat = featureScores.nlargest(500,'Score')
+print(uni_selected_feat) # print out the top n features selected
+# Saving the top n features to a data frame
+top_univariate_features = pd.DataFrame()
+for i in range(0, 500):
+    curr_column_vals = X.iloc[:, uni_selected_feat.iloc[i].name]
+    curr_column_name = uni_selected_feat.iloc[i][0]
+    top_univariate_features[curr_column_name] = curr_column_vals
+X = top_univariate_features
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
+
+X_test.to_csv('X_test500.csv', index=None, header=True, encoding='utf-8')
+y_test = y_test.to_frame(name='labels')
+y_test.to_csv('y_test500.csv', index=None, header=True, encoding='utf-8')
+
+from imblearn.under_sampling import CondensedNearestNeighbour
+print("Condensed Nearest Neighbour!!")
+cnn = CondensedNearestNeighbour(random_state=2)
+X_res, y_res = cnn.fit_resample(X_train, y_train)
+X_cnn = pd.DataFrame(X_res)
+X_cnn.columns = uni_selected_feat['Specs']
+y_cnn = pd.DataFrame()
+y_cnn['labels'] = y_res
+X_cnn.to_csv('X_cnn500.csv', index=None, header=True, encoding='utf-8')
+y_cnn.to_csv('y_cnn500.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+X = pd.DataFrame(M)
+y = df['class'].astype(int)
+X.columns = feature_names
+
+#Feature selection
+from sklearn.feature_selection import SelectKBest, f_classif
+# Univariate Selection -- apply SelectKBest class to extract top n best features
+bestfeatures = SelectKBest(score_func=f_classif, k=1000)
+fit = bestfeatures.fit(X,y)
+dfscores = pd.DataFrame(fit.scores_)
+dfcolumns = pd.DataFrame(X.columns)
+# concat two dataframes for better visualization
+featureScores = pd.concat([dfcolumns,dfscores],axis=1)
+featureScores.columns = ['Specs','Score']  #naming the dataframe columns
+print('Univariate Selection features found, use getUnivariateData() to get the features')
+# Extract the top n features
+uni_selected_feat = featureScores.nlargest(1000,'Score')
+print(uni_selected_feat) # print out the top n features selected
+# Saving the top n features to a data frame
+top_univariate_features = pd.DataFrame()
+for i in range(0, 1000):
+    curr_column_vals = X.iloc[:, uni_selected_feat.iloc[i].name]
+    curr_column_name = uni_selected_feat.iloc[i][0]
+    top_univariate_features[curr_column_name] = curr_column_vals
+X = top_univariate_features
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
+
+X_test.to_csv('X_test1000.csv', index=None, header=True, encoding='utf-8')
+y_test = y_test.to_frame(name='labels')
+y_test.to_csv('y_test1000.csv', index=None, header=True, encoding='utf-8')
+
+from imblearn.under_sampling import CondensedNearestNeighbour
+print("Condensed Nearest Neighbour!!")
+cnn = CondensedNearestNeighbour(random_state=2)
+X_res, y_res = cnn.fit_resample(X_train, y_train)
+X_cnn = pd.DataFrame(X_res)
+X_cnn.columns = uni_selected_feat['Specs']
+y_cnn = pd.DataFrame()
+y_cnn['labels'] = y_res
+X_cnn.to_csv('X_cnn1000.csv', index=None, header=True, encoding='utf-8')
+y_cnn.to_csv('y_cnn1000.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+X = pd.DataFrame(M)
+y = df['class'].astype(int)
+X.columns = feature_names
+
+#Feature selection
+from sklearn.feature_selection import SelectKBest, f_classif
+# Univariate Selection -- apply SelectKBest class to extract top n best features
 bestfeatures = SelectKBest(score_func=f_classif, k=3000)
 fit = bestfeatures.fit(X,y)
 dfscores = pd.DataFrame(fit.scores_)
@@ -223,10 +311,24 @@ X = top_univariate_features
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
-X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
+X_test.to_csv('X_test3000.csv', index=None, header=True, encoding='utf-8')
 y_test = y_test.to_frame(name='labels')
-y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
+y_test.to_csv('y_test3000.csv', index=None, header=True, encoding='utf-8')
 
+from imblearn.under_sampling import CondensedNearestNeighbour
+print("Condensed Nearest Neighbour!!")
+cnn = CondensedNearestNeighbour(random_state=2)
+X_res, y_res = cnn.fit_resample(X_train, y_train)
+X_cnn = pd.DataFrame(X_res)
+X_cnn.columns = uni_selected_feat['Specs']
+y_cnn = pd.DataFrame()
+y_cnn['labels'] = y_res
+X_cnn.to_csv('X_cnn3000.csv', index=None, header=True, encoding='utf-8')
+y_cnn.to_csv('y_cnn3000.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
+
+'''
 from imblearn.under_sampling import RandomUnderSampler
 print("Random Under Sampler!!")
 rus = RandomUnderSampler(random_state=42)
@@ -249,18 +351,6 @@ y_cc = pd.DataFrame()
 y_cc['labels'] = y_res
 X_cc.to_csv('X_cc.csv', index=None, header=True, encoding='utf-8')
 y_cc.to_csv('y_cc.csv', index=None, header=True, encoding='utf-8')
-print("Done!")
-
-from imblearn.under_sampling import CondensedNearestNeighbour
-print("Condensed Nearest Neighbour!!")
-cnn = CondensedNearestNeighbour(random_state=2)
-X_res, y_res = cnn.fit_resample(X_train, y_train)
-X_cnn = pd.DataFrame(X_res)
-X_cnn.columns = uni_selected_feat['Specs']
-y_cnn = pd.DataFrame()
-y_cnn['labels'] = y_res
-X_cnn.to_csv('X_cnn.csv', index=None, header=True, encoding='utf-8')
-y_cnn.to_csv('y_cnn.csv', index=None, header=True, encoding='utf-8')
 print("Done!")
 
 from imblearn.under_sampling import EditedNearestNeighbours
@@ -310,7 +400,7 @@ y_oss['labels'] = y_res
 X_oss.to_csv('X_oss.csv', index=None, header=True, encoding='utf-8')
 y_oss.to_csv('y_oss.csv', index=None, header=True, encoding='utf-8')
 print("Done!")
-
+'''
 
 
 
