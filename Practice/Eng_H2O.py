@@ -205,6 +205,18 @@ X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
 y_test = y_test.to_frame(name='labels')
 y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
 
+from imblearn.under_sampling import ClusterCentroids
+print("Cluster Centroids!!")
+cc = ClusterCentroids(random_state=2)
+X_res, y_res = cc.fit_resample(X_train, y_train)
+X_cc = pd.DataFrame(X_res)
+X_cc.columns = feature_names
+y_cc = pd.DataFrame()
+y_cc['labels'] = y_res
+X_cc.to_csv('X_cc.csv', index=None, header=True, encoding='utf-8')
+y_cc.to_csv('y_cc.csv', index=None, header=True, encoding='utf-8')
+print("Done!")
+
 from imblearn.under_sampling import CondensedNearestNeighbour
 print("Condensed Nearest Neighbour!!")
 cnn = CondensedNearestNeighbour(random_state=2)
