@@ -13,7 +13,6 @@ import re
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import RFE
 from sklearn.linear_model import LogisticRegression
-import statsmodels.api as sm
 from textstat.textstat import *
 import matplotlib.pyplot as plt
 from imblearn.under_sampling import (CondensedNearestNeighbour)
@@ -266,7 +265,6 @@ print(len(y))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
-y_train = y_train.to_frame(name='labels')
 y_test = y_test.to_frame(name='labels')
 
 X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
