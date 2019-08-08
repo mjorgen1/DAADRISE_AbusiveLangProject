@@ -202,7 +202,6 @@ X.columns = feature_names
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.1)
 
 X_test.to_csv('X_test.csv', index=None, header=True, encoding='utf-8')
-y_train = y_train.to_frame(name='labels')
 y_test = y_test.to_frame(name='labels')
 y_test.to_csv('y_test.csv', index=None, header=True, encoding='utf-8')
 
