@@ -1,7 +1,5 @@
 # Multi-Class Detection of Abusive Language on Twitter Using Automated Machine Learning
 
-# Hierarchical Multi-Agent Deep Reinforcement Learning to Develop Long-Term Coordination
-
 Mackenzie Jorgensen, Minho Choi, Marco Niemann, Jens Brunk, & Jorg Becker
 
 <p align="center">
