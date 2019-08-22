@@ -16,4 +16,5 @@ We owe a great deal to Davidson et al. (data and code) and Wiegand et al.'s (dat
 ## Execution
 To execute the German run, go to /H2o-Work/Germ_H2OAutoML-ULTRA.ipynb and you can see comments relating to feature selection algorithms and undersampling techniques. You can choose which methods you would like to run by commenting out the ones you do not want and uncommenting the ones you would like to use. Further, you will have to save the German data-set from Wiegand et al.'s GitHub and update your folders in the code with regard to the data and saving models and results. Then you can run the Jupyter Notebook on your machine. 
 
-To execute the English run...
+To execute the English run, go to /H2o-Work/EnglishH2OAutoML-ULTRA.ipynb and you can see comments relating to feature selection algorithms and undersampling techniques. You can choose which methods you would like to run by commenting out the ones you do not want and uncommenting the ones you would like to use and importing different undersampling methods. Further, you will have to save the English data-set from Davidson et al.'s GitHub and update your folders in the code with regard to the data and saving models and results. Then you can run the Jupyter Notebook on your machine. 
+
