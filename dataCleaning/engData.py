@@ -12,25 +12,26 @@ from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import wordnet
+from nltk.corpus import stopwords
+# need to run the following once:
+# import nltk
+# nltk.download('stopwords')
+
+# run the below in terminal:
+# python3 -m spacy download en_core_web_md
 
 
 ''' Initializing variables '''
 tokenizer = ToktokTokenizer()
-stopword_list = nltk.corpus.stopwords.words('english')
+stopword_list = stopwords.words('english')
 stopword_list.extend(['rt'])
 nlp = spacy.load('en_core_web_md')
 lemmatizer = WordNetLemmatizer()
 stemmer = PorterStemmer()
 
-
-# Check the location of current working directory and move the dataset to that directory
-os.getcwd()
-# Or change the working directory
-os.chdir('C:\\Users\\mikec\\Documents')
-
-
 ''' Raw Data'''
-data = pd.read_csv("EnglishData.csv")
+# put in path for dataset
+data = pd.read_csv("labeled_data.csv")
 
 # Remove first five columns, since they are not needed for the AutoML
 data = data.iloc[:, 5:]
@@ -317,5 +318,16 @@ data.dropna(subset=['cleaned_tweet'], inplace=True)
 
 # Export dataframe as csv
 data.to_csv("EnglishCleanedData.csv", index=None, header=True, encoding='utf-8')
+
+# Option to export dataframe as tsv
+data.to_csv("labeled_tweets.tsv", index=True, header=False, sep="\t", encoding='utf-8')
+
+# Other options below:
+# Drop cleaned tweet, if only want original tweet
+#data.drop('cleaned_tweet', axis=1)
+'''0: hate speech, 1: offensive language, 2: neither'''
+# Change labels back to string class form
+#data['labels']= data['labels'].replace({0: 'hate_speech', 1: 'offensive_language', 2: 'neither'})
+
 
 
