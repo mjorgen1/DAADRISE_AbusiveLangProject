@@ -324,7 +324,7 @@ data.to_csv("labeled_tweets.tsv", index=True, header=False, sep="\t", encoding='
 
 # Other options below:
 # Drop cleaned tweet, if only want original tweet
-#data.drop('cleaned_tweet', axis=1)
+#data=data.drop('cleaned_tweet', axis=1)
 '''0: hate speech, 1: offensive language, 2: neither'''
 # Change labels back to string class form
 #data['labels']= data['labels'].replace({0: 'hate_speech', 1: 'offensive_language', 2: 'neither'})
