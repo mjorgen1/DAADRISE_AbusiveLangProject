@@ -10,6 +10,7 @@ Abusive language detection is a difficult task for comment moderators. Machine L
 We owe a great deal to Davidson et al. (data and code) and Wiegand et al.'s (data) work. We extended Davidson's code here by adding H2O-Auto-ML, German language functionality for pre-processing and feature extraction, and feature selection and undersampling methods. 
 
 ## Links
+\- [Research paper final version published](https://library.gito.de/oa_wi2020-r7.html)
 \- [Davidson et al.'s GitHub Repository](https://github.com/t-davidson/hate-speech-and-offensive-language)
 \- [Wiegand et al.'s GitHub Repository](https://github.com/uds-lsv/GermEval-2018-Data)
 
