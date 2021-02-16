@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 import copy
 import re
 from collections import Counter
@@ -7,28 +6,41 @@ import matplotlib.pyplot as plt
 import numpy as np
 import nltk
 
-#Check the location of current working directory and move the dataset to that directory
-os.getcwd()
-#Or change the working directory
-os.chdir('C:\\Users\\mikec\\Documents')
 
-# Raw data
-data = pd.read_csv("EnglishData.csv", encoding="utf-8")
+# TODO: to use stopwords below, you may need to run the below in your python env
+# import nltk
+# nltk.download('stopwords')
 
-# Label distribution
-labels = copy.deepcopy(data['class'])
+
+# Load data from csv
+# TODO: adjust the path as need be and use the csv called "EnglishCleanedData.csv" in dataCleaning folder
+# the first column is the cleaned tweet
+# the second column is the original tweet
+# the third column is the labeled tweet
+# 0: hate speech, 1: offensive language, 2: neither
+data = pd.read_csv("/home/mackenzie/git_repositories/DAADRISE_AbusiveLangProject/dataCleaning/EnglishCleanedData.csv", encoding="utf-8")
+
+# Figure 1: Label distribution
+labels = copy.deepcopy(data['labels'])
 plt.bar(['Hate', 'Offensive', 'Neither'], [labels.value_counts()[0]/len(labels), labels.value_counts()[1]/len(labels),
                                            labels.value_counts()[2]/len(labels)])
 plt.show()
+print('Hate speech count: ')
+print(labels.value_counts()[0]/len(labels))
+print('Offensive speech count: ')
+print(labels.value_counts()[1]/len(labels))
+print('Neither speech count: ')
+print(labels.value_counts()[2]/len(labels))
 
-# Length of tweets
-lens = data.tweet.str.len()
+# Figure 2: Length of tweets
+# TODO: you can change the tweet column name below: "cleaned_tweet" or "tweet" (original tweet)
+lens = data.cleaned_tweet.str.len()
 plt.hist(lens, bins='auto')
 plt.xlim(0, 300)
 plt.show()
 
-# 10 most frequently appeared words
-tweets = copy.deepcopy(data['tweet'])
+# Figure 3: 10 most frequently appeared words
+tweets = copy.deepcopy(data['cleaned_tweet'])
 for i in range(0, len(tweets)-1):
     currLine = tweets[i]
     newLine = ""
